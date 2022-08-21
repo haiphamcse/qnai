@@ -61,8 +61,8 @@ class TextProcessing:
         features = data.loc[:, 'Review']
         del data
         X_train, X_test, Y_train, Y_test = train_test_split(features, labels, test_size=0.2)
-        self.train_features, self.test_features, self.train_labels, self.test_labels = list(X_train), list(
-            X_test), list(Y_train), list(Y_test)
+        self.train_features, self.test_features, self.train_labels, self.test_labels = list(X_train[:10]), list(
+            X_test[:10]), list(Y_train[:10]), list(Y_test[:10])
 
     def _clean_sentences(self, string):
         string = string.lower().replace("<br />", " ")
@@ -97,4 +97,6 @@ class TextProcessing:
             val_encodings,
             self.test_labels
         ))
+
+
         return train_encodings, val_encodings, self.train_labels, self.test_labels, train_dataset, val_dataset
