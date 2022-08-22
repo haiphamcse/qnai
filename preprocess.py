@@ -83,9 +83,9 @@ class TextProcessing:
         # print(self.train_tokens[:5])
 
         #   Encode string using tokenizer
-        train_encodings = [self.tokenizer(train_tokens, truncation=True, padding=True) for train_tokens in
+        train_encodings = [self.tokenizer(train_tokens, truncation=True, padding=True,  return_tensors="tf") for train_tokens in
                            self.train_tokens]  # --> Return word indices of each tokenized words list
-        val_encodings = [self.tokenizer(test_tokens, truncation=True, padding=True) for test_tokens in
+        val_encodings = [self.tokenizer(test_tokens, truncation=True, padding=True,  return_tensors="tf") for test_tokens in
                          self.test_tokens]  # --> Return word indices
 
 

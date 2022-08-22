@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-
 class QHD_PhoBert(tf.keras.Model):
     def __init__(self, config=trs.AutoConfig.from_pretrained("vinai/phobert-base"), *inputs, **kwargs):
         super(QHD_PhoBert, self).__init__(*inputs, **kwargs)
@@ -22,6 +21,7 @@ class QHD_PhoBert(tf.keras.Model):
         outputs = self.dense(outputs)
         outputs = self.classifier(outputs)
         return outputs
+
 
 
 def train(model, train_dataset):
