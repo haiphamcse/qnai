@@ -1,12 +1,8 @@
 
 # Press the green button in the gutter to run the script.
-import preprocess
 import model
-import transformers as trs
-import tensorflow as tf
-import numpy as np
-import tensorflow_datasets as tfds
-    # processor = preprocess.TextProcessing("vinai/phobert-base")
+
+# processor = preprocess.TextProcessing("vinai/phobert-base")
     # processor.read_csv("data.csv")
     # train_encodings, val_encodings, train_labels, val_labels, train_dataset, val_dataset = processor.process()
     #

@@ -1,6 +1,4 @@
 import transformers as trs
-import pandas as pd
-import numpy as np
 import tensorflow as tf
 import preprocess
 
@@ -100,3 +98,4 @@ def pipeline(model=None, datafile="data.csv", config="vinai/phobert-base", train
 #
 #                 if i % 100 == 0:
 #                     print("step %d: mean loss = %.4f" % (i, loss_metric.result()))
+
