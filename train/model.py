@@ -15,6 +15,7 @@ class QHD_Model(tf.keras.Model):
         if not seperate:
             self.kernels = tf.keras.Sequential([
                 Dense(768, activation = 'relu'),
+                Dropout(0.5),
                 Dense(6, activation = 'sigmoid')
             ])
 
@@ -22,6 +23,7 @@ class QHD_Model(tf.keras.Model):
             self.kernels = []
             self.kernels.extend( [tf.keras.Sequential([
                     Dense(768, activation = 'relu'),
+                    Dropout(0.5),
                     Dense(1, activation = 'sigmoid')
                 ]) for i in range(6)]
             )
