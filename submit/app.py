@@ -24,6 +24,7 @@ def solve():
         "results": {}
       }
     for count, r in enumerate(RATING_ASPECTS):
+        print(count, r)
         output["results"][r] = predict_results[count]
 
     return jsonify(output)

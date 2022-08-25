@@ -46,7 +46,6 @@ def train(model, epochs: int, batch_size: int, lr: float, save_path, beta_adam =
 
     return history
 
-
 if __name__ == '__main__':
     
     model = model.QHD_Model(seperate = False)
