@@ -3,7 +3,7 @@ import config
 import settings
 from solver import ClassifyReviewSolver
 
-review_solver = ClassifyReviewSolver(config)
+review_solver = ClassifyReviewSolver()
 
 app = Flask(__name__)
 
