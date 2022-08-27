@@ -7,7 +7,6 @@ from dataset import *
 from tqdm import tqdm
 import argparse
 import matplotlib.pyplot as plt
-import re
 import utils
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -30,9 +29,11 @@ def train(model: nn.Module, epochs: int, batch_size: int, lr: float, train_datas
     train_loader = get_data_loader(dataset=train_dataset, batch_size=batch_size, shuffle = None)
     val_loader = get_data_loader(dataset=val_dataset, batch_size = batch_size, shuffle = None)
 
-    tokenizer = trs.AutoTokenizer.from_pretrained("vinai/phobert-base", use_fast = False)
+    tokenizer = trs.AutoTokenizer.from_pretrained("vinai/phobert-base", use_fast = True)
     phobert = trs.AutoModel.from_pretrained("vinai/phobert-base")
-    
+
+    for param in phobert.parameters():
+        param.requires_grad = False
 
     #   Tokenize text -> Embedding
     for epoch in range(epochs):
@@ -40,18 +41,13 @@ def train(model: nn.Module, epochs: int, batch_size: int, lr: float, train_datas
         for (idx, batch) in tqdm(enumerate(train_loader)):
             text, label = batch
             label = (label > 0).type(torch.float64)
-            
             #   Clean and text
-            clean_text = [utils._clean_sentences(sentence) for sentence in text]    
-            tokenized_text = [utils._vn_tokenize(sentence) for sentence in clean_text]
-
             with torch.no_grad():
-                feature = tokenizer.encode(tokenized_text, truncation = True, padding = True, return_tensors = "pt")
-                feature = phobert(feature)
-                feature = feature[1]
-                print(feature.shape)
+                feature = tokenizer(text, truncation = True, padding = True, return_tensors = "pt")                
+                feature = phobert(input_ids = feature['input_ids'], token_type_ids = feature['token_type_ids'])
+
             optimizer.zero_grad()
-            logits = model(feature)
+            logits = model(feature[1])
             loss = balance_loss(label, logits)
             loss.backward()
             optimizer.step()
@@ -94,8 +90,9 @@ if __name__ == '__main__':
     train_dataset = QNAIDataset("data.csv", "train")
     val_dataset = QNAIDataset("data.csv", "test")
     parse = argparse.ArgumentParser()    
-    parse.add_argument("--save_model", required=True)
+    parse.add_argument("--save_model", required=False)
     parser = parse.parse_args()
 
-    train_loss, val_loss = train(model, epochs, batch_size, lr, train_dataset, val_dataset, parser.save_model)
+    save_model_path = ""
+    train_loss, val_loss = train(model, epochs, batch_size, lr, train_dataset, val_dataset, save_model_path)
     plt.plot(train_loss, val_loss)

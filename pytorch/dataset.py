@@ -5,6 +5,7 @@ import transformers as trs
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
+import utils
 
 class QNAIDataset(Dataset):
 
@@ -19,7 +20,10 @@ class QNAIDataset(Dataset):
         del data
         print("Load successfully!")
 
-        x_train, x_test, self.y_train, self.y_test = train_test_split(features, labels, test_size=0.2)
+        clean_text = [utils._clean_sentences(sentence) for sentence in features]    
+        tokenized_text = [utils._vn_tokenize(sentence) for sentence in clean_text]
+        x_train, x_test, self.y_train, self.y_test = train_test_split(tokenized_text, labels, test_size=0.2)
+        
         self.mode = mode
         self.x_train = list(x_train)
         self.x_test = list(x_test)
