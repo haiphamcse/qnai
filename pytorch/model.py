@@ -11,12 +11,13 @@ class QHD_Model(nn.Module):
             self.kernels = nn.Sequential(*[
                 nn.Linear(768, 768),
                 nn.ReLU(),
+                nn.Dropout(p = 0.5),
                 nn.Linear(768, 6),
                 nn.Sigmoid()
             ])
         
         else:
-            self.kernels = []
+            self.kernels = nn.ModuleList()
             self.kernels.extend(
                 [nn.Sequential(*[
                 nn.Linear(768, 768),
