@@ -9,6 +9,25 @@ ONLY use this AFTER TRAINING and EXPORTING WEIGHTS is COMPLETE
 '''
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+import re
+from underthesea import word_tokenize, sent_tokenize
+
+def _clean_sentences(string):
+    strip_special_chars = re.compile("[^\w0-9 ]+")
+    string = re.sub(r"[\.,\?]+$-", "", string)
+    string = string.lower().replace("<br />", " ")
+    string = string.replace(",", " ").replace(".", " ") \
+        .replace(";", " ").replace("“", " ") \
+        .replace(":", " ").replace("”", " ") \
+        .replace('"', " ").replace("'", " ") \
+        .replace("!", " ").replace("?", " ") \
+        .replace("-", " ").replace("?", " ")
+    return re.sub(strip_special_chars, "", string.lower())
+
+def _vn_tokenize(string : str) -> str:
+
+    return word_tokenize(string, format = "text")
+
 class QHD_Model(nn.Module):
     def __init__(self, seperate) -> None:
         super(QHD_Model, self).__init__()
@@ -25,7 +44,7 @@ class QHD_Model(nn.Module):
             ])
         
         else:
-            self.kernels = []
+            self.kernels = nn.ModuleList()
             self.kernels.extend(
                 [nn.Sequential(*[
                 nn.Linear(768, 768),
@@ -57,8 +76,10 @@ class ReviewClassifierModel(nn.Module):
 
     def __call__(self, text):
         #Single input
-        out = self.tokenizer.encode(text, truncation=True, padding=True,  return_tensors="pt")
-        out = self.phobert(out)
+        clean_sentence = _clean_sentences(text)
+        input = [_vn_tokenize(clean_sentence)]
+        out = self.tokenizer(input, truncation=True, padding=True,  return_tensors="pt")
+        out = self.phobert(input_ids = out['input_ids'], token_type_ids = out['token_type_ids'])
         with torch.no_grad():
             out = self.classifier(out[1]).cpu().detach().numpy()
         #HAVEN'T HANDLE YET
