@@ -1,3 +1,4 @@
+from importlib.metadata import requires
 from pkgutil import get_data
 import torch.nn as nn
 import torch
@@ -112,11 +113,15 @@ if __name__ == '__main__':
     batch_size = 150
     mode_train = "regression"
 
-    train_dataset = QNAIDataset("data.csv", "train")
-    val_dataset = QNAIDataset("data.csv", "test")
     parse = argparse.ArgumentParser()    
     parse.add_argument("--save_model", required=False)
+    parse.add_argument("--train_path", required = True)
+    parse.add_argument("--test_path", required=True)
     parser = parse.parse_args()
+
+    train_dataset = QNAIDataset(parser.train_path, "train")
+    val_dataset = QNAIDataset(parser.test_path, "test")
+    
 
     save_model_path = parser.save_model
     train_loss, val_loss = train(regressor_model, mode_train, epochs, batch_size, lr, train_dataset, val_dataset, save_model_path)
