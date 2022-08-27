@@ -36,6 +36,22 @@ class QHD_Model(nn.Module):
         
         return out
 
+class QHD_Regressor(nn.Module):
+    def __init__(self, mode) -> None:
+        super(QHD_Regressor, self).__init__()
+        self.mode = mode
+
+        self.kernels = nn.Sequential(*[
+            nn.Linear(768, 768),
+            nn.ReLU(),
+            nn.Linear(768,512),
+            nn.ReLU(),
+            nn.Linear(512,6)
+        ])
+    
+    def forward(self, x):
+        return self.kernels(x)
+
 # x = torch.randn((3,768))
 # model = QHD_Model(True)
 # print(model(x).shape)

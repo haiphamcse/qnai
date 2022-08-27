@@ -1,6 +1,5 @@
 from lib2to3.pgen2 import token
 import re
-from vncorenlp import VnCoreNLP
 from underthesea import word_tokenize, sent_tokenize
 
 def _clean_sentences(string):
