@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import utils
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
+print("Using device: {} ---".format(device))
 def balance_loss(y, y_pred, alpha = 0.9, beta = 0.1):
     loss =  - (1.-y_pred)**alpha * y * torch.log(y_pred) -  (y_pred) ** beta * (1.-y)* torch.log(1. - y_pred)
     loss = torch.sum(loss, dim = 1) / 6.0
@@ -20,7 +20,8 @@ def balance_loss(y, y_pred, alpha = 0.9, beta = 0.1):
 
 def mse(y, y_pred):
     square = (y - y_pred) ** 2
-    return torch.mean(square)
+    loss = torch.mean(square)
+    return loss.to(device)
 
 def train(model: nn.Module, mode_train, epochs: int, batch_size: int, lr: float, train_dataset, val_dataset, save_path_model) -> None:
     
@@ -30,7 +31,7 @@ def train(model: nn.Module, mode_train, epochs: int, batch_size: int, lr: float,
         optimizer = torch.optim.Adam(model.kernels.parameters(), lr = lr)
     
     train_losses = [1.5]
-    val_losses = [1.5]
+    val_losses = [10.]
     model.train()
 
     train_loader = get_data_loader(dataset=train_dataset, batch_size=batch_size, shuffle = None)
@@ -60,8 +61,8 @@ def train(model: nn.Module, mode_train, epochs: int, batch_size: int, lr: float,
                 feature = phobert(input_ids = feature['input_ids'], token_type_ids = feature['token_type_ids'])
                 
             optimizer.zero_grad()
-            logits = model(feature[1])
-
+            logits = model(feature[1].to(device))
+            logits = logits.to(device)
             if mode_train == "classify":
                 loss = balance_loss(label, logits)
             elif mode_train == "regression":
@@ -84,7 +85,8 @@ def train(model: nn.Module, mode_train, epochs: int, batch_size: int, lr: float,
             with torch.no_grad():
                 val_feature = tokenizer(val_text, truncation = True, padding = True, return_tensors = "pt")
                 val_feature = phobert(input_ids = val_feature['input_ids'], token_type_ids = val_feature['token_type_ids'])
-                val_logits = model(val_feature[1])
+                val_logits = model(val_feature[1].to(device))
+                val_logits = val_logits.to(device)
                 if mode_train == "classify":
                     val_loss = balance_loss(val_label, val_logits)
                 else :
@@ -105,13 +107,18 @@ def train(model: nn.Module, mode_train, epochs: int, batch_size: int, lr: float,
 
 
 if __name__ == '__main__':
-    classifier_model = QHD_Model(False).to(device)
-    regressor_model = QHD_Regressor(False).to(device)
+    
 
-    epochs = 50
-    lr = 1e-2
-    batch_size = 150
+    epochs = 100
+    lr = 5e-3
+    batch_size = 512
+    
     mode_train = "regression"
+
+    if mode_train == "classify":
+        model = QHD_Model(False).to(device)
+    elif mode_train == "regression":
+        model = QHD_Regressor(False).to(device)
 
     parse = argparse.ArgumentParser()    
     parse.add_argument("--save_model", required=False)
@@ -124,4 +131,4 @@ if __name__ == '__main__':
     
 
     save_model_path = parser.save_model
-    train_loss, val_loss = train(regressor_model, mode_train, epochs, batch_size, lr, train_dataset, val_dataset, save_model_path)
+    train_loss, val_loss = train(model, mode_train, epochs, batch_size, lr, train_dataset, val_dataset, save_model_path)

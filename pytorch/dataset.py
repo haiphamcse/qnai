@@ -22,7 +22,7 @@ class QNAIDataset(Dataset):
 
         clean_text = [utils._clean_sentences(sentence) for sentence in features]    
         tokenized_text = [utils._vn_tokenize(sentence) for sentence in clean_text]
-        x_train, x_test, self.y_train, self.y_test = train_test_split(tokenized_text, labels, test_size=0.2)
+        x_train, x_test, self.y_train, self.y_test = train_test_split(tokenized_text, labels, test_size=0.1)
         
         self.mode = mode
         self.x_train = list(x_train)
@@ -41,5 +41,6 @@ class QNAIDataset(Dataset):
             return (self.x_test[idx], self.y_test[idx])
 
 def get_data_loader(dataset: Dataset, batch_size: int, shuffle: bool):
+    print("Dataset contains: {} samples".format(len(dataset)))
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 

@@ -73,7 +73,19 @@ class ReviewClassifierModel(nn.Module):
     def setup_classifier(self):
         #TEMPORARY, WILL ADD CONFIG TO CLASSIFIER LATER
         self.classifier.load_state_dict(torch.load("ckpt_model"))
+    
+    def ensemble_result(y_pred: torch.Tensor, y_reg: torch.Tensor):
 
+        n_rank = torch.sum((y_reg >= 1).type(torch.int16), dim = 1).cpu().detach().numpy().shape[0]  # Get number of highest prob
+        indices = torch.topk(y_pred, k=n_rank, dim = 1).indices.cpu().detach().numpy()
+        rows, cols = indices.shape
+        _y_pred = torch.zeros(3,6)
+        for i in range(rows):
+            for j in range(cols):
+                y_pred[i, indices[i,j]] = 1
+
+        return (_y_pred * y_reg).type(torch.int16)
+    
     def __call__(self, text):
         #Single input
         clean_sentence = _clean_sentences(text)
