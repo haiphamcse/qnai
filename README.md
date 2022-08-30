@@ -1,4 +1,3 @@
-# qnai
 QHD_HCM - Challenge 2 Quy Nhon AI 2022
 ======
 _@_ Nguyen Ho Quang, Pham Duc Hai, Nguyen Ngoc Hai Dang.
@@ -14,5 +13,14 @@ Training
 ------
 ```python
 cd pytorch
-python train.py --save_model nameofmodel --train_path "data_train.csv" --test_path "data_test.csv"
+python train.py --save_model "bert.pt" --train_path "data_train.csv" --test_path "data_test.csv"
 ```
+
+Inferencing
+------
+```python
+cd submit
+python app.py
+```
+You can submit via POST at: http://127.0.0.1:6000/review-solver/solve?review_sentence
+Add sentence you want to detect via passing as value to review_sentence
